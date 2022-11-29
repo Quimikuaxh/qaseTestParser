@@ -1,5 +1,5 @@
 import * as reader from "xlsx";
-import tests from "../tests.json";
+const fs = require('fs');
 import specialCharacters from "./files/SpecialCharacters.json";
 
 
@@ -58,5 +58,7 @@ function solveSpecialCharacters(text: string){
    return solvedText;
 }
 
+let rawdata = fs.readFileSync('./tests.json');
+let tests = JSON.parse(rawdata);
 const testData = getTests(tests);
 addRows(testData);
