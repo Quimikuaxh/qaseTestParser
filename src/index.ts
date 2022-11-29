@@ -27,6 +27,7 @@ function getTests(jsonData) {
   }
   else if(jsonData?.suites.length > 0){
     for(const suite of jsonData.suites){
+      console.log(suite.title);
       testcases.push(...getTests(suite));
     }
   }
@@ -44,8 +45,6 @@ function parseSteps(test){
     steps = steps.concat(solveSpecialCharacters(`${step.position}. ${step.action}\n`));
     expectedResults = expectedResults.concat(solveSpecialCharacters(`${step.position}. ${step.expected_result}\n`));
   }
-  console.log(steps);
-  console.log(expectedResults);
   return [steps, expectedResults];
 }
 
