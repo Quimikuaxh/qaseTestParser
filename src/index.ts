@@ -4,6 +4,7 @@ import specialCharacters from "./files/SpecialCharacters.json";
 
 
  function addRows(data){
+   console.log(JSON.stringify(data));
    const workbook = reader.readFile('./test.xlsx');
    const testCasesSheet = workbook.Sheets['Casos de prueba'];
    reader.utils.sheet_add_json(testCasesSheet, data, {skipHeader: true, origin: 'A2'});
@@ -12,7 +13,15 @@ import specialCharacters from "./files/SpecialCharacters.json";
 
 function getTests(jsonData) {
   const testcases = [];
-  if(jsonData?.cases.length > 0){
+
+  if(jsonData?.suites.length > 0){
+    for(const suite of jsonData.suites){
+      console.log(suite.title);
+      testcases.push(...getTests(suite));
+    }
+  }
+
+  else if(jsonData?.cases.length > 0){
     for(const testcase of jsonData.cases){
       const parsedSteps = parseSteps(testcase);
       testcases.push({
@@ -25,14 +34,9 @@ function getTests(jsonData) {
       });
     }
   }
-  else if(jsonData?.suites.length > 0){
-    for(const suite of jsonData.suites){
-      console.log(suite.title);
-      testcases.push(...getTests(suite));
-    }
-  }
+
   else{
-    throw 'Object passed as argument has not tests nor suites.'
+    console.log('This suite passed as argument has not tests nor suites.');
   }
   return testcases;
 }
