@@ -14,15 +14,17 @@ import specialCharacters from "./files/SpecialCharacters.json";
 function getTests(jsonData) {
   const testcases = [];
 
-  if(jsonData?.suites.length > 0){
-    for(const suite of jsonData.suites){
-      console.log(suite.title);
+  if (jsonData.suites && Array.isArray(jsonData?.suites)) {
+    for (const suite of jsonData.suites) {
       testcases.push(...getTests(suite));
     }
-  }
-
-  else if(jsonData?.cases.length > 0){
-    for(const testcase of jsonData.cases){
+  } else if (jsonData.suites) {
+    const keys = Object.keys(jsonData.suites);
+    for (const key of keys) {
+      testcases.push(...getTests(jsonData.suites[key]));
+    }
+  } if (jsonData?.cases.length > 0) {
+    for (const testcase of jsonData.cases) {
       const parsedSteps = parseSteps(testcase);
       testcases.push({
         suite: solveSpecialCharacters(jsonData.title),
@@ -30,11 +32,11 @@ function getTests(jsonData) {
         description: solveSpecialCharacters(testcase.description),
         precondition: solveSpecialCharacters(testcase.preconditions),
         steps: parsedSteps[0],
+        data: parsedSteps[2],
         expected_results: parsedSteps[1]
       });
     }
   }
-
   else{
     console.log('This suite passed as argument has not tests nor suites.');
   }
@@ -44,12 +46,14 @@ function getTests(jsonData) {
 function parseSteps(test){
   let steps = '';
   let expectedResults = '';
+  let data = '';
 
   for(const step of test.steps){
     steps = steps.concat(solveSpecialCharacters(`${step.position}. ${step.action}\n`));
     expectedResults = expectedResults.concat(solveSpecialCharacters(`${step.position}. ${step.expected_result}\n`));
+    data = data.concat(solveSpecialCharacters(`${step.data}\n`));
   }
-  return [steps, expectedResults];
+  return [steps, expectedResults, data];
 }
 
 function solveSpecialCharacters(text: string){
